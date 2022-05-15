@@ -17,7 +17,7 @@ service.interceptors.request.use(
     )
 
     if (sessionStorage.getItem('token')) {
-      config.headers['Authorization'] = `Bearer ${sessionStorage.getItem('token')}`
+      config.headers['Authorization'] = `${sessionStorage.getItem('token')}`
     }
 
     return config
@@ -38,6 +38,10 @@ service.interceptors.response.use(
       'padding: 3px;',
       response.data
     )
+
+    if (response.headers.authorization) {
+      sessionStorage.setItem('token', response.headers.authorization)
+    }
 
     return response.data
   },

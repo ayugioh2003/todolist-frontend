@@ -86,7 +86,7 @@
 import { ref, onMounted, defineComponent } from 'vue';
 import { useRouter } from "vue-router";
 import { Field, Form } from "vee-validate";
-import { useForm, useField, useIsFormValid, useSubmitForm } from 'vee-validate';
+import { useForm, useField, useSubmitForm } from 'vee-validate';
 import * as yup from 'yup';
 import Swal from 'sweetalert2'
 // API

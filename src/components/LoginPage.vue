@@ -34,7 +34,6 @@
       <div class="flex flex-col justify-items-center items-center">
         <button 
           class="w-[160px] h-[47px] mb-[24px] bg-secondary px-[12px] rounded-[10px] text-white"
-          
         >
           登入
         </button>
@@ -50,15 +49,17 @@
 </template>
 
 <script>
-import { ref, onMounted, defineComponent } from 'vue';
-import { useForm, useField } from 'vee-validate'
+// Utils
+import { defineComponent } from 'vue';
+import { useRouter } from 'vue-router'
+import { useForm, useField, useSubmitForm } from 'vee-validate'
 import * as yup from 'yup'
+import { signInAPI } from '@/api/user.js'
+import Swal from 'sweetalert2'
 
 export default defineComponent({
-  components: {
-    
-  },
   setup(props, { emit }) {
+    const router = useRouter()
     const schema = yup.object({
       email: yup.string().required('此欄位不可為空').email('Email 格式無效'),
       password: yup.string().required('此欄位不可為空').min(8, '密碼必須至少 8 字'),
@@ -72,7 +73,30 @@ export default defineComponent({
 
     // 切換頁面
     const changePage = () => emit('changePage', 'login')
-    const checkForm = () => {
+
+    // 檢查表單
+    const checkForm = useSubmitForm(async(values, actions) => {
+      const params = {
+        user: {
+          email: email.value,
+          password: password.value
+        }
+      }
+      fetchSignIn(params)
+    })
+
+    // 請求登入 API
+    const fetchSignIn = async (params) => {
+      const { message } = await signInAPI(params)
+
+      if (message === '登入成功') {
+        Swal.fire({
+          icon: 'success',
+          title: `成功`,
+          html: message,
+        })
+        router.push({ name: 'todo' })
+      }
 
     }
 

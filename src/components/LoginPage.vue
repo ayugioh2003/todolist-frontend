@@ -1,7 +1,10 @@
 <template>
-  <div>
+  <div class="container mx-auto">
+    <CoverImage class="hidden sm:block" />
     Login
-    <CoverImage />
+    <div>
+      
+    </div>
   </div>
 </template>
 

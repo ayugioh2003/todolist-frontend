@@ -1,6 +1,6 @@
 <template>
-<div class="inline-block">
-  <img :src="image" class="mx-auto text-center" alt="Cover Image">
+<div>
+  <img :src="image" alt="Logo">
 </div>
 </template>
 
@@ -10,7 +10,7 @@ import { ref } from 'vue';
 export default {
 
   setup() {
-    const image = ref(require('@/assets/index-left.png'));
+    const image = ref(require('@/assets/logo.png'));
 
     return {
       image,

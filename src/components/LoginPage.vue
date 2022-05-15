@@ -11,8 +11,11 @@
           id="email" 
           class="placeholder:text-placholder px-[16px] py-[12px] rounded-[10px] mt-[4px]"
           type="email" placeholder="請輸入Email"
-          required />
-        <span class="text-error text-[14px] font-bold mt-[4px]">此欄位不可為空</span>
+          v-model="email"
+        />
+        <span class="text-error text-[14px] font-bold mt-[4px]">
+          {{ emailError }}
+        </span>
       </div>
 
       <div class="flex flex-col mb-[16px]">
@@ -21,8 +24,11 @@
         class="placeholder:text-placholder px-[16px] py-[12px] rounded-[10px] mt-[4px]"
         type="password" 
         placeholder="請輸入密碼"
-        required>
-        <span class="text-error text-[14px] font-bold mt-[4px]">請輸入密碼</span>
+        v-model="password"
+        />
+        <span class="text-error text-[14px] font-bold mt-[4px]">
+          {{ passwordError }}
+        </span>
       </div>
 
       <div class="flex flex-col justify-items-center items-center">
@@ -45,13 +51,24 @@
 
 <script>
 import { ref, onMounted, defineComponent } from 'vue';
+import { useForm, useField } from 'vee-validate'
+import * as yup from 'yup'
 
 export default defineComponent({
   components: {
     
   },
   setup(props, { emit }) {
-    onMounted(() => console.log('component mounted!'));
+    const schema = yup.object({
+      email: yup.string().required('此欄位不可為空').email('Email 格式無效'),
+      password: yup.string().required('此欄位不可為空').min(8, '密碼必須至少 8 字'),
+    });
+    useForm({
+      validationSchema: schema
+    })
+
+    const { value: email, errorMessage: emailError } = useField('email');
+    const { value: password, errorMessage: passwordError } = useField('password');
 
     // 切換頁面
     const changePage = () => emit('changePage', 'login')
@@ -61,7 +78,11 @@ export default defineComponent({
 
     return {
       checkForm,
-      changePage
+      changePage,
+      email,
+      emailError,
+      password,
+      passwordError,
     };
   },
 });

@@ -11,8 +11,9 @@
           id="email" 
           class="placeholder:text-placholder px-[16px] py-[12px] rounded-[10px] mt-[4px]"
           type="email" placeholder="請輸入Email"
-          required />
-        <span class="text-error text-[14px] font-bold mt-[4px]">此欄位不可為空</span>
+          v-model="email"
+          />
+        <span class="text-error text-[14px] font-bold mt-[4px]">{{ emailError }}</span>
       </div>
 
       <div class="flex flex-col mb-[16px]">
@@ -22,9 +23,11 @@
           class="placeholder:text-placholder px-[16px] py-[12px] rounded-[10px] mt-[4px]"
           type="text" 
           placeholder="請輸入暱稱"
-          required
+          v-model="name"
         >
-        <span class="text-error text-[14px] font-bold mt-[4px]">請輸入暱稱</span>
+        <span class="text-error text-[14px] font-bold mt-[4px]">
+          {{ nameError }}
+        </span>
       </div>
 
       <div class="flex flex-col mb-[16px]">
@@ -33,8 +36,11 @@
         class="placeholder:text-placholder px-[16px] py-[12px] rounded-[10px] mt-[4px]"
         type="password" 
         placeholder="請輸入密碼"
-        required>
-        <span class="text-error text-[14px] font-bold mt-[4px]">請輸入密碼</span>
+        v-model="password"
+        >
+        <span class="text-error text-[14px] font-bold mt-[4px]">
+          {{ passwordError }}
+        </span>
       </div>
 
       <div class="flex flex-col mb-[16px]">
@@ -44,14 +50,16 @@
         id="confirmPassword"
         type="password" 
         placeholder="請再次輸入密碼"
-        required>
-        <span class="text-error text-[14px] font-bold mt-[4px]">請再次輸入密碼</span>
+        v-model="confirmPassword"
+        >
+        <span class="text-error text-[14px] font-bold mt-[4px]">
+          {{ confirmPasswordError }}
+        </span>
       </div>
 
       <div class="flex flex-col justify-items-center items-center">
         <button 
           class="w-[160px] h-[47px] mb-[24px] bg-secondary px-[12px] rounded-[10px] text-white"
-          
         >
           註冊帳號
         </button>
@@ -68,12 +76,29 @@
 
 <script>
 import { ref, onMounted, defineComponent } from 'vue';
+import { useForm, useField } from 'vee-validate';
+import * as yup from 'yup';
 
 export default defineComponent({
-  components: {
-    
-  },
   setup(props, { emit }) {
+
+    const schema = yup.object({
+      email: yup.string().required('此欄位不可為空').email('Email 格式無效'),
+      name: yup.string().required('').min(2, '暱稱至少兩字'),
+      password: yup.string().required('此欄位不可為空').min(8, '密碼必須至少 8 字'),
+      confirmPassword: yup.string().required('此欄位不可為空').min(8, '密碼必須至少 8 字'),
+      confirmPassword: yup.string().required('此欄位不可為空').min(8, '密碼必須至少 8 字').oneOf([yup.ref('password')], '密碼與再次輸入密碼不同')
+    });
+
+    useForm({
+      validationSchema: schema,
+    });
+
+    const { value: email, errorMessage: emailError } = useField('email');
+    const { value: password, errorMessage: passwordError } = useField('password');
+    const { value: name, errorMessage: nameError } = useField('name');
+    const { value: confirmPassword, errorMessage: confirmPasswordError } = useField('confirmPassword');
+
     onMounted(() => console.log('component mounted!'));
 
     // 切換頁面
@@ -84,7 +109,15 @@ export default defineComponent({
 
     return {
       checkForm,
-      changePage
+      changePage,
+      email,
+      emailError,
+      password,
+      passwordError,
+      name,
+      nameError,
+      confirmPassword,
+      confirmPasswordError
     };
   },
 });

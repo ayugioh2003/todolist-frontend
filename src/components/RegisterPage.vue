@@ -1,6 +1,6 @@
 <template>
     <Form 
-      :validation-schema="schema"
+      :validation-schema="RegisterSchema"
       class="mt-[21px] mb-[12px] sm:mt-0 sm:w-[300px]"
       @submit="checkForm"
       ref="form"
@@ -87,7 +87,7 @@ import { ref, onMounted, defineComponent } from 'vue';
 import { useRouter } from "vue-router";
 import { Field, Form } from "vee-validate";
 import { useForm, useField, useSubmitForm } from 'vee-validate';
-import * as yup from 'yup';
+import { RegisterSchema } from '@/utils/schema';
 import Swal from 'sweetalert2'
 // API
 import { signUpAPI } from '@/api/user.js'
@@ -100,15 +100,9 @@ export default defineComponent({
   setup(props, { emit }) {
     const router = useRouter()
     const form = ref(null) // undefined
-    const schema = yup.object().shape({
-      email: yup.string().required('此欄位不可為空').email('Email 格式無效'),
-      name: yup.string().required('此欄位不可為空').min(2, '暱稱至少兩字'),
-      password: yup.string().required('此欄位不可為空').min(6, '密碼必須至少 6 字'),
-      confirmPassword: yup.string().required('此欄位不可為空').min(6, '密碼必須至少 6 字').oneOf([yup.ref('password')], '密碼與再次輸入密碼不同')
-    });
 
     useForm({
-      validationSchema: schema,
+      validationSchema: RegisterSchema,
     });
 
     const { value: email, errorMessage: emailError } = useField('email');
@@ -151,7 +145,7 @@ export default defineComponent({
       form,
       checkForm,
       changePage,
-      schema,
+      RegisterSchema,
       email,
       emailError,
       password,

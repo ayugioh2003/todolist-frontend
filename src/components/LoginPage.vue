@@ -56,16 +56,14 @@ import { useForm, useField, useSubmitForm } from 'vee-validate'
 import * as yup from 'yup'
 import { signInAPI } from '@/api/user.js'
 import Swal from 'sweetalert2'
+import { LoginSchema } from '@/utils/schema'
 
 export default defineComponent({
   setup(props, { emit }) {
     const router = useRouter()
-    const schema = yup.object({
-      email: yup.string().required('此欄位不可為空').email('Email 格式無效'),
-      password: yup.string().required('此欄位不可為空').min(8, '密碼必須至少 8 字'),
-    });
+    
     useForm({
-      validationSchema: schema
+      validationSchema: LoginSchema
     })
 
     const { value: email, errorMessage: emailError } = useField('email');
@@ -103,6 +101,7 @@ export default defineComponent({
     return {
       checkForm,
       changePage,
+      LoginSchema,
       email,
       emailError,
       password,

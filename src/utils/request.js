@@ -59,18 +59,19 @@ service.interceptors.response.use(
     const { status, message, error: resError, data } = error.response.data
 
     // API 400, 401 僅會吐 error, status
-    switch (status) {
+    switch (error.response.status) {
       case 400:
         Swal.fire({
           icon: 'error',
-          title: `Oppps..${status}`,
+          title: `Oppps..${error.response.status} 錯誤`,
           text: resError,
         })
         break
       case 401:
+      case 404:
         Swal.fire({
           icon: 'error',
-          title: `Oppps..${message}`,
+          title: `Oppps..${error.response.status} 錯誤`,
           text: message,
         })
         break

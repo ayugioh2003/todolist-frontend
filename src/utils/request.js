@@ -1,5 +1,6 @@
 import axios from 'axios'
 import Swal from 'sweetalert2'
+import { getToken, setToken } from '@/utils/token'
 
 const service = axios.create({
   baseURL: 'https://todoo.5xcamp.us/',
@@ -16,8 +17,8 @@ service.interceptors.request.use(
       config.data ? config.data : ''
     )
 
-    if (sessionStorage.getItem('token')) {
-      config.headers['Authorization'] = `${sessionStorage.getItem('token')}`
+    if (getToken()) {
+      config.headers['Authorization'] = `${getToken()}`
     }
 
     return config
@@ -40,7 +41,7 @@ service.interceptors.response.use(
     )
 
     if (response.headers.authorization) {
-      sessionStorage.setItem('token', response.headers.authorization)
+      setToken(response.headers.authorization)
     }
 
     return response.data
@@ -50,8 +51,14 @@ service.interceptors.response.use(
     console.error(`❌ 發生錯誤：${error}`)
     console.error(error.response)
 
-    if (error?.response && error?.response?.data) {
-      const { message, error: resError } = error.response.data
+    const { message, error: resError } = error.response.data
+    if (error.response.status === 401) {
+      Swal.fire({
+        icon: 'error',
+        title: `Oppps..${message}`,
+        html: message,
+      })
+    } else if (error?.response && error?.response?.data) {
       let str = ''
       Object.values(resError).forEach(err => {
         str += `${err} <br/>`
@@ -62,6 +69,7 @@ service.interceptors.response.use(
         html: str,
       })
     }
+
   }
 )
 

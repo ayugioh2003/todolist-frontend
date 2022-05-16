@@ -9,15 +9,26 @@ const routes = [
     component: HomePage,
   },
   {
-    path: '/',
+    path: '/todo',
     name: 'todo',
     component: TodoPage,
+    meta: {
+      isAuth: true
+    }
   },
 ];
-
+import { getToken } from '@/utils/token.js'
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes,
 });
+
+router.beforeEach(async (to, from, next) => {
+  if (!getToken() && to.meta.isAuth) {
+    next({ name: 'home' })
+  }
+
+  next()
+})
 
 export default router;

@@ -14,7 +14,7 @@ service.interceptors.request.use(
       `%c👨‍💻 Request:%c${config.url}`,
       'background:#3F51B5; padding: 3px; border-radius: 5px; color: #fff;',
       'padding: 3px;',
-      config.data ? config.data : ''
+      config.data ? config.data : '無參數'
     )
 
     if (getToken()) {
@@ -49,16 +49,42 @@ service.interceptors.response.use(
 
   error => {
     console.error(`❌ 發生錯誤：${error}`)
-    console.error(error.response)
+    console.log(
+      `%c🔌 Error Response:%c${error.config.url}`,
+      'background:red; padding: 3px; border-radius: 5px; color: #fff;',
+      'padding: 3px;',
+      error.response.data
+    )
 
-    const { message, error: resError } = error.response.data
-    if (error.response.status === 401) {
-      Swal.fire({
-        icon: 'error',
-        title: `Oppps..${message}`,
-        html: message,
-      })
-    } else if (error?.response && error?.response?.data) {
+    const { status, message, error: resError, data } = error.response.data
+
+    // API 400, 401 僅會吐 error, status
+    switch (status) {
+      case 400:
+        Swal.fire({
+          icon: 'error',
+          title: `Oppps..${status}`,
+          text: resError,
+        })
+        break
+      case 401:
+        Swal.fire({
+          icon: 'error',
+          title: `Oppps..${message}`,
+          text: message,
+        })
+        break
+      default:
+        Swal.fire({
+          icon: 'error',
+          title: `Oppps..:(`,
+          text: '系統發生錯誤，請稍後再試',
+        })
+        break
+    }
+
+    // 顯示錯誤訊息，API 有吐 data
+    if (error?.response && status && data) {
       let str = ''
       Object.values(resError).forEach(err => {
         str += `${err} <br/>`

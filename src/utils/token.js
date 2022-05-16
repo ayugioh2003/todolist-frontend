@@ -18,4 +18,4 @@ export const setToken = (token) => sessionStorage.setItem(tokenName, token)
  * 移除 Token
  * @date 2022-05-16
  */
-export const removeToken = () => sessionStorage.removeItem(tokenName)
+export const removeToken = () => sessionStorage.clear()

@@ -100,8 +100,8 @@
 // Utils
 import { onMounted, ref, reactive } from '@vue/runtime-core'
 import { useForm, useField, useSubmitForm } from 'vee-validate'
-import Swal from 'sweetalert2'
 import { TodoSchema } from '@/utils/schema'
+import { showSuccess } from '@/utils/resHandle'
 // API
 import { getTodoListAPI, createTodoAPI, updateTodoAPI, deleteTodoAPI } from '@/api/todo'
 // Components
@@ -161,12 +161,7 @@ export default {
     }
 
     const handleSuccessCreateTodo = (content) => {
-      Swal.fire({
-        icon: 'success',
-        title: `成功`,
-        text: `新增 ${content} 成功`,
-      })
-
+      showSuccess({ content: `${content} 建立成功` })
       getTodoList()
     }
 
@@ -175,12 +170,7 @@ export default {
         const { message } = await deleteTodoAPI(id)
 
         if (message === '已刪除') {
-          Swal.fire({
-            icon: 'success',
-            title: `成功`,
-            text: `刪除成功`,
-          })
-
+          showSuccess({ content: `${id} 刪除成功` })
           getTodoList()
         }
       } catch (error) {

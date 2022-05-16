@@ -83,16 +83,16 @@
 
 <script>
 // Utils
-import { ref, onMounted, defineComponent } from 'vue';
+import { ref, provide, reactive } from 'vue';
 import { useRouter } from "vue-router";
 import { Field, Form } from "vee-validate";
 import { useForm, useField, useSubmitForm } from 'vee-validate';
 import { RegisterSchema } from '@/utils/schema'
-import Swal from 'sweetalert2'
+import { showSuccess } from '@/utils/resHandle'
 // API
 import { signUpAPI } from '@/api/user.js'
 
-export default defineComponent({
+export default {
   components: {
     Field,
     Form,
@@ -100,6 +100,11 @@ export default defineComponent({
   setup(props, { emit }) {
     const router = useRouter()
     const form = ref(null) // undefined
+    const user = reactive({
+      email: '',
+      nickname: ''
+    })
+    provide('user', user)
     
     useForm({
       validationSchema: RegisterSchema,
@@ -118,7 +123,7 @@ export default defineComponent({
       const params = {
         user: {
           email: email.value,
-          name: name.value,
+          nickname: name.value,
           password: password.value
         }
       }
@@ -127,21 +132,18 @@ export default defineComponent({
 
     // 請求註冊 API
     const fetchSignUp = async (params) => {
-      const { message } = await signUpAPI(params)
-      
-        if (message === '註冊成功') {
-          Swal.fire({
-            icon: 'success',
-            title: `成功`,
-            html: message,
-          })
+      const { message, nickname } = await signUpAPI(params)
 
+        if (message === '註冊成功') {
+          sessionStorage.setItem('nickname', nickname)
+          showSuccess({ content: `${message}` })
           // 跳轉頁面
           router.push({ name: 'home', params: { isRegister: false } })
         }
     }
 
     return {
+      user,
       form,
       checkForm,
       changePage,
@@ -156,7 +158,7 @@ export default defineComponent({
       confirmPasswordError,
     };
   },
-});
+};
 </script>
 
 <style>

@@ -55,7 +55,7 @@ import { useRouter } from 'vue-router'
 import { useForm, useField, useSubmitForm } from 'vee-validate'
 import * as yup from 'yup'
 import { LoginSchema } from '@/utils/schema' 
-import Swal from 'sweetalert2'
+import { showSuccess } from '@/utils/resHandle'
 // API
 import { signInAPI } from '@/api/user.js'
 
@@ -88,14 +88,9 @@ export default defineComponent({
       const { message } = await signInAPI(params)
 
       if (message === '登入成功') {
-        Swal.fire({
-          icon: 'success',
-          title: `成功`,
-          html: message,
-        })
+        showSuccess({ content: `${message}` })
         router.push({ name: 'todo' })
       }
-
     }
 
     return {

@@ -5,10 +5,12 @@
 </template>
 
 <style lang="scss">
-#app {
-  font-family: Noto Sans TC;
-  font-size: 14px;
-  background: #FFD370;
+body {
+  font-family: "Noto Sans TC";
+  width: 100%;
   height: 100%;
+}
+#app {
+  font-size: 14px;
 }
 </style>

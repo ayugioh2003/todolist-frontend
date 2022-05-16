@@ -37,3 +37,7 @@ export const LoginSchema = yup.object({
     .required(errorMsg.required)
     .min(6, errorMsg.password(6)),
 });
+
+export const TodoSchema = yup.object({
+  todo: yup.string().required(errorMsg.required)
+})

@@ -11,7 +11,9 @@ module.exports = {
       secondary: '#333',
       placeholder: '#9F9A91',
       white: '#fff',
-      error: '#D87355'
+      error: '#D87355',
+      border: '#efefef',
+      checked: '#e5e5e5'
     }
   },
   plugins: [],

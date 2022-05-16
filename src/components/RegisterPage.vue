@@ -83,7 +83,7 @@
 
 <script>
 // Utils
-import { ref, onMounted, defineComponent } from 'vue';
+import { ref } from 'vue';
 import { useRouter } from "vue-router";
 import { Field, Form } from "vee-validate";
 import { useForm, useField, useSubmitForm } from 'vee-validate';
@@ -92,7 +92,7 @@ import Swal from 'sweetalert2'
 // API
 import { signUpAPI } from '@/api/user.js'
 
-export default defineComponent({
+export default {
   components: {
     Field,
     Form,
@@ -162,7 +162,7 @@ export default defineComponent({
       confirmPasswordError,
     };
   },
-});
+};
 </script>
 
 <style>

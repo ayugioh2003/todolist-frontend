@@ -50,14 +50,10 @@
 </template>
 
 <script>
-import { ref, onMounted, defineComponent } from 'vue';
 import { useForm, useField } from 'vee-validate'
 import * as yup from 'yup'
 
-export default defineComponent({
-  components: {
-    
-  },
+export default {
   setup(props, { emit }) {
     const schema = yup.object({
       email: yup.string().required('此欄位不可為空').email('Email 格式無效'),
@@ -85,7 +81,7 @@ export default defineComponent({
       passwordError,
     };
   },
-});
+};
 </script>
 
 <style>

@@ -2,27 +2,32 @@
   <div class="h-[100vh] flex justify-start items-center flex-col px-8">
     <HeaderComponent />
     <div class="bg-half"></div>
-    <div class="flex mb-[16px] w-full relative shadow-custom">
-      <input 
-        v-model="todo"
-        type="text"
-        placeholder="新增待辦事項"
-        class="
-          w-full leading-[23px] text-[16px] 
-          color-placeholder px-[12px] py-[16px] 
-          rounded-[6px] border-0 bg-white
-          h-[47px]
-        "
-      />
-      <span class="text-error text-[14px] font-bold mt-[4px]">
-        {{ todoError }}
-      </span>
-      <a
-        class="absolute right-[15px] top-[4px]" 
-        @click="addNewTodo()"
+    <div class="w-full">
+      <form 
+        class="flex mb-[16px] w-full relative shadow-custom"
+        @submit.prevent="checkForm"
       >
-        <img src="../assets/add.svg" alt="Create Todo">
-      </a>
+        <input 
+          v-model="todo"
+          type="text"
+          placeholder="新增待辦事項"
+          class="
+            w-full leading-[23px] text-[16px] 
+            color-placeholder px-[12px] py-[16px] 
+            rounded-[6px] border-0 bg-white
+            h-[47px]
+          "
+        />
+        <span class="text-error text-[14px] font-bold mt-[4px]">
+          {{ todoError }}
+        </span>
+        <a
+          class="absolute right-[15px] top-[4px]" 
+          @click="checkForm()"
+        >
+          <img src="../assets/add.svg" alt="Create Todo">
+        </a>
+      </form>
     </div>
 
     <div class="rounded-[10px] bg-white w-full">
@@ -50,8 +55,8 @@
       <div>
         <ul class="todolist__table">
           <li 
-            v-for="n in 6"
-            :key="n"
+            v-for="todo in todos"
+            :key="todo.id"
             class="flex justify-start items-center pl-[16px] h-[88px] border-b border-checked"
           >
             <input
@@ -63,7 +68,7 @@
                 border-placeholder-500
               "
             >
-            <span>爆肝趕作業</span>
+            <span>{{ todo.content }}</span>
             <a class="delete ml-auto mr-[18px]" href="#">
               <i class="fa fa-x"></i>
             </a>
@@ -95,7 +100,7 @@ import { useForm, useField, useSubmitForm } from 'vee-validate'
 import Swal from 'sweetalert2'
 import { TodoSchema } from '@/utils/schema'
 // API
-import { getTodoListAPI } from '@/api/todo'
+import { getTodoListAPI, createTodoAPI, updateTodoAPI, deleteTodoAPI } from '@/api/todo'
 // Components
 import HeaderComponent from '@/components/Header';
 
@@ -106,7 +111,6 @@ export default {
   },
 
   setup() {
-
     const tabs = reactive([
       { name: '全部', value: 'all' },
       { name: '待完成', value: 'no-completed' },
@@ -114,6 +118,7 @@ export default {
     ])
 
     const activeTab = ref('all')
+    let todos = ref([])
 
 
     useForm({ validationSchema: TodoSchema })
@@ -121,20 +126,46 @@ export default {
 
     // 檢查表單
     const checkForm = useSubmitForm(async(values, actions) => {
-      
+      const params = {
+        todo: {
+          content: todo.value
+        }
+      }
+
+      // 請求 API
+      fetchCreateTodo(params)
+
     })
 
     onMounted(() => {
       getTodoList()
     })
 
+    // 請求清單
     const getTodoList = async () => {
-      await getTodoListAPI()
+      const res = await getTodoListAPI()
+      todos.value = res.todos
+      console.log(todos)
     }
 
     // 新增 Todo
-    const addNewTodo = async () => {
+    const fetchCreateTodo = async (params) => {
+      try {
+        const { id, content } = await createTodoAPI(params)        
+        if (id && content) handleSuccessCreateTodo(content)
+      } catch (error) {
+        console.error(error)
+      }
+    }
 
+    const handleSuccessCreateTodo = (content) => {
+      Swal.fire({
+        icon: 'success',
+        title: `成功`,
+        text: `新增 ${content} 成功`,
+      })
+
+      getTodoList()
     }
 
     // 清除已完成項目
@@ -147,9 +178,10 @@ export default {
       activeTab,
       HeaderComponent,
       checkForm,
+      todos,
       todo,
       todoError,
-      addNewTodo,
+      fetchCreateTodo,
       clearCompletedTodo
     }
   }

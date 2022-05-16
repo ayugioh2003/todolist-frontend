@@ -69,7 +69,10 @@
               "
             >
             <span>{{ todo.content }}</span>
-            <a class="delete ml-auto mr-[18px]" href="#">
+            <a 
+              class="delete ml-auto mr-[18px]" 
+              @click="deleteTodo(todo.id)"
+            >
               <i class="fa fa-x"></i>
             </a>
           </li>
@@ -145,7 +148,6 @@ export default {
     const getTodoList = async () => {
       const res = await getTodoListAPI()
       todos.value = res.todos
-      console.log(todos)
     }
 
     // 新增 Todo
@@ -168,6 +170,24 @@ export default {
       getTodoList()
     }
 
+    const deleteTodo = async (id) => {
+      try {
+        const { message } = await deleteTodoAPI(id)
+
+        if (message === '已刪除') {
+          Swal.fire({
+            icon: 'success',
+            title: `成功`,
+            text: `刪除成功`,
+          })
+
+          getTodoList()
+        }
+      } catch (error) {
+        console.error(error)
+      }
+    }
+
     // 清除已完成項目
     const clearCompletedTodo = async () => {
 
@@ -182,7 +202,8 @@ export default {
       todo,
       todoError,
       fetchCreateTodo,
-      clearCompletedTodo
+      clearCompletedTodo,
+      deleteTodo
     }
   }
 

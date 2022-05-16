@@ -4,8 +4,10 @@
       <LogoImage class="h-[54px] w-[242px] flex justify-center items-center" />
     </router-link>
     <div class="flex flex-row items-center">
-      <span class="hidden sm:block sm:mr-[24px] font-bold text-secondary text-[14px] sm:text-[16px]">
-        王小明的代辦
+      <span 
+        v-if="nickname"
+        class="hidden sm:block sm:mr-[24px] font-bold text-secondary text-[14px] sm:text-[16px]">
+        {{ nickname }} 的代辦
       </span>
       <button 
         class="whitespace-nowrap text-[14px] sm:text-[16px]"
@@ -21,6 +23,7 @@
 // Utils
 import { useRouter } from 'vue-router'
 import { removeToken } from '@/utils/token'
+import { onMounted, ref } from 'vue'
 // API
 import { signOutAPI } from '@/api/user'
 // Components
@@ -35,6 +38,8 @@ export default {
 
   setup() {
     const router = useRouter()
+    const nickname = ref()
+
 
     // 請求登出
     const fetchSignOut = async () => {
@@ -60,9 +65,14 @@ export default {
       }
     }
 
+    onMounted(() => {
+      nickname.value = sessionStorage.getItem('nickname', nickname)
+    })
+
     return {
       LogoImage,
-      fetchSignOut
+      fetchSignOut,
+      nickname,
     }
   }
 }

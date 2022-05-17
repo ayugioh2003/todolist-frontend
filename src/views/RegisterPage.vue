@@ -1,4 +1,10 @@
 <template>
+  <div class="px-[32px] py-[48px] sm:flex sm:flex-row sm:items-center sm:justify-center sm:h-[100vh]">
+    <div class="sm:mr-[6rem]">
+      <LogoImage class="sm:mb-[20px] flex justify-center items-center" />
+      <CoverImage class="hidden sm:block sm:h-[386px]" />
+    </div>
+
     <Form 
       :validation-schema="RegisterSchema"
       class="mt-[21px] mb-[12px] sm:mt-0 sm:w-[300px]"
@@ -72,13 +78,14 @@
         </button>
         <button 
           class="mb-[24px] font-bold-700 text-secondary"
-          @click="changePage"
         >
-          登入
+          <router-link :to="{name: 'login'}">
+            登入
+          </router-link>
         </button>
       </div>
     </form>
-
+  </div>
 </template>
 
 <script>
@@ -91,9 +98,14 @@ import { RegisterSchema } from '@/utils/schema'
 import { showSuccess } from '@/utils/resHandle'
 // API
 import { signUpAPI } from '@/api/user.js'
+// Component
+import LogoImage from '@/components/LogoImage'
+import CoverImage from '@/components/CoverImage';
 
 export default {
   components: {
+    LogoImage,
+    CoverImage,
     Field,
     Form,
   },
@@ -115,9 +127,6 @@ export default {
     const { value: name, errorMessage: nameError } = useField('name');
     const { value: confirmPassword, errorMessage: confirmPasswordError } = useField('confirmPassword');
 
-    // 切換頁面
-    const changePage = () => emit('changePage', 'register')
-
     // 送出請求
     const checkForm = useSubmitForm(async (values, actions) => {  
       const params = {
@@ -138,7 +147,7 @@ export default {
           sessionStorage.setItem('nickname', nickname)
           showSuccess({ content: `${message}` })
           // 跳轉頁面
-          router.push({ name: 'home', params: { isRegister: false } })
+          router.push({ name: 'login', params: { isRegister: false } })
         }
     }
 
@@ -146,7 +155,6 @@ export default {
       user,
       form,
       checkForm,
-      changePage,
       RegisterSchema,
       email,
       emailError,

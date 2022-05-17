@@ -2,14 +2,20 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import { getToken } from '@/utils/token.js'
 // Components
-import HomePage from '../views/HomePage';
 import TodoPage from '../views/TodoPage';
+import RegisterPage from '../views/RegisterPage';
+import LoginPage from '../views/LoginPage';
 
 const routes = [
   {
     path: '/',
-    name: 'home',
-    component: HomePage,
+    name: 'register',
+    component: RegisterPage,
+  },
+  {
+    path: '/login',
+    name: 'login',
+    component: LoginPage,
   },
   {
     path: '/todo',
@@ -28,7 +34,7 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
   if (!getToken() && to.meta.isAuth) {
-    next({ name: 'home' })
+    next({ name: 'login' })
   }
 
   next()

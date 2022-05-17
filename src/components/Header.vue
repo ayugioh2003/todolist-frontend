@@ -58,7 +58,7 @@ export default {
           removeToken()
 
           // 跳轉至登入頁
-          router.push({ name: 'home' })
+          router.push({ name: 'login' })
         }
       } catch (error) {
         removeToken()

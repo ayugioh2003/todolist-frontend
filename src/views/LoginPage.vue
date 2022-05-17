@@ -1,4 +1,10 @@
 <template>
+  <div class="px-[32px] py-[48px] sm:flex sm:flex-row sm:items-center sm:justify-center sm:h-[100vh]">
+    <div class="sm:mr-[6rem]">
+      <LogoImage class="sm:mb-[20px] flex justify-center items-center" />
+      <CoverImage class="hidden sm:block sm:h-[386px]" />
+    </div>
+  
     <form 
       class="mt-[21px] mb-[12px] sm:mt-0 sm:w-[300px]"
       @submit.prevent="checkForm"
@@ -45,7 +51,7 @@
         </button>
       </div>
     </form>
-
+  </div>
 </template>
 
 <script>
@@ -58,8 +64,15 @@ import { LoginSchema } from '@/utils/schema'
 import { showSuccess } from '@/utils/resHandle'
 // API
 import { signInAPI } from '@/api/user.js'
+// Component
+import LogoImage from '@/components/LogoImage'
+import CoverImage from '@/components/CoverImage';
 
-export default defineComponent({
+export default {
+  components: {
+    LogoImage,
+    CoverImage
+  },
   setup(props, { emit }) {
     const router = useRouter()
     useForm({
@@ -68,9 +81,6 @@ export default defineComponent({
 
     const { value: email, errorMessage: emailError } = useField('email');
     const { value: password, errorMessage: passwordError } = useField('password');
-
-    // 切換頁面
-    const changePage = () => emit('changePage', 'login')
 
     // 檢查表單
     const checkForm = useSubmitForm(async(values, actions) => {
@@ -95,14 +105,13 @@ export default defineComponent({
 
     return {
       checkForm,
-      changePage,
       email,
       emailError,
       password,
       passwordError,
     };
   },
-});
+};
 </script>
 
 <style>

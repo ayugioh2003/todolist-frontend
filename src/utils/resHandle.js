@@ -10,3 +10,11 @@ export const showSuccess = (
   })
 }
 
+export const showError = (
+  { title = '', content = '系統發生錯誤，請稍後再試' }) => {
+  Swal.fire({
+    icon: 'error',
+    title: `Oppps..${title}`,
+    html: content,
+  })
+}

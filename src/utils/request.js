@@ -1,6 +1,7 @@
 import axios from 'axios'
 import Swal from 'sweetalert2'
 import { getToken, setToken } from '@/utils/token'
+import { showError } from '@/utils/resHandle'
 
 const service = axios.create({
   baseURL: 'https://todoo.5xcamp.us/',
@@ -58,44 +59,36 @@ service.interceptors.response.use(
 
     const { status, message, error: resError, data } = error.response.data
 
-    // API 400, 401 僅會吐 error, status
+    // API 400, 401 僅會吐 error, status，沒有 message
     switch (error.response.status) {
       case 400:
-        Swal.fire({
-          icon: 'error',
-          title: `Oppps..${error.response.status} 錯誤`,
-          text: resError,
-        })
+        showError({ title: error.response.status, content: resError })
         break
+
       case 401:
       case 404:
-        Swal.fire({
-          icon: 'error',
-          title: `Oppps..${error.response.status} 錯誤`,
-          text: message,
-        })
+        showError({ title: error.response.status, content: message })
         break
+
+      case 422:
+        showError({ title: message, content: resError[0] })
+        break
+
       default:
-        Swal.fire({
-          icon: 'error',
-          title: `Oppps..:(`,
-          text: '系統發生錯誤，請稍後再試',
-        })
+        // 顯示錯誤訊息，API 有吐 data
+        if (error?.response && status && data) {
+          let str = ''
+          Object.values(resError).forEach(err => {
+            str += `${err} <br/>`
+          })
+          showError({ title: message, content: str })
+          return
+        }
+
+        showError({ title: '發生錯誤' })
         break
     }
 
-    // 顯示錯誤訊息，API 有吐 data
-    if (error?.response && status && data) {
-      let str = ''
-      Object.values(resError).forEach(err => {
-        str += `${err} <br/>`
-      })
-      Swal.fire({
-        icon: 'error',
-        title: `Oppps..${message}`,
-        html: str,
-      })
-    }
 
   }
 )

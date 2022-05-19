@@ -61,7 +61,6 @@
 // Utils
 import { useRouter } from 'vue-router'
 import { useForm, useField, useSubmitForm } from 'vee-validate'
-import * as yup from 'yup'
 import { LoginSchema } from '@/utils/schema' 
 import { showSuccess } from '@/utils/resHandle'
 // API
@@ -75,9 +74,8 @@ export default {
     LogoImage,
     CoverImage
   },
-  setup(props, { emit }) {
+  setup() {
     const router = useRouter()
-
     useForm({
       validationSchema: LoginSchema
     })

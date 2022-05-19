@@ -90,7 +90,7 @@
 
 <script>
 // Utils
-import { ref, provide, reactive } from 'vue';
+import { ref, reactive } from 'vue';
 import { useRouter } from "vue-router";
 import { Field, Form } from "vee-validate";
 import { useForm, useField, useSubmitForm } from 'vee-validate';
@@ -109,14 +109,13 @@ export default {
     Field,
     Form,
   },
-  setup(props, { emit }) {
+  setup() {
     const router = useRouter()
     const form = ref(null) // undefined
     const user = reactive({
       email: '',
       nickname: ''
     })
-    provide('user', user)
     
     useForm({
       validationSchema: RegisterSchema,

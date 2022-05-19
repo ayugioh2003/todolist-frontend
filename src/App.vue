@@ -1,22 +1,26 @@
 <template>
-<div :class="{ 'bg-primary': !isTodoPage }">
-  <div class="mx-auto container">
-    <router-view/>
+  <div :class="{ 'bg-primary': !isTodoPage }" class="relative h-[100vh]">
+    <div class="mx-auto container">
+      <router-view/>
+    </div>
   </div>
-</div>
 </template>
 
 <script>
-import { useRoute, useLink } from 'vue-router'
+// Utils
+import { useRoute } from 'vue-router'
+import { computed } from 'vue'
 
 export default {
   setup() {
-    const route = useRoute()
-    const isTodoPage = route.name === 'todo'
-
-    return {
-      isTodoPage
-    }
+      const route = useRoute();
+      const isTodoPage = computed(() => {
+        return route.name === "todo";
+      })
+      
+      return {
+          isTodoPage
+      };
   },
 }
 </script>

@@ -29,6 +29,7 @@ import { signOutAPI } from '@/api/user'
 // Components
 import LogoImage from '@/components/LogoImage';
 import Swal from 'sweetalert2'
+import { showSuccess } from '@/utils/resHandle'
 
 export default {
   name: 'HeaderComponent',
@@ -48,11 +49,7 @@ export default {
         const { message } = await signOutAPI()
         
         if (message && message === '已登出') {
-          Swal.fire({
-            icon: 'success',
-            title: `成功`,
-            html: message,
-          })
+          showSuccess({ content: '登出成功'})
 
           // 移除 Token
           removeToken()

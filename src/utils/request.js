@@ -1,8 +1,7 @@
 import axios from 'axios'
-import Swal from 'sweetalert2'
-import { getToken, setToken } from '@/utils/token'
+import { getToken, setToken, removeToken } from '@/utils/token'
 import { showError } from '@/utils/resHandle'
-
+import router from '@/router'
 const service = axios.create({
   baseURL: 'https://todoo.5xcamp.us/',
   timeout: 50000,
@@ -66,6 +65,9 @@ service.interceptors.response.use(
         break
 
       case 401:
+        showError({ title: error.response.status, content: message })
+        removeToken()
+        router.push({ name: 'login' })
       case 404:
         showError({ title: error.response.status, content: message })
         break

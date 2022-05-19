@@ -9,7 +9,9 @@
       class="mt-[21px] mb-[12px] sm:mt-0 sm:w-[300px]"
       @submit.prevent="checkForm"
     >
-      <h1 class="text-[24px] font-bold text-center">最實用的線上代辦事項服務</h1>
+      <h1 class="whitespace-nowrap mb-[20px] text-[24px] font-bold text-center">
+        最實用的線上代辦事項服務
+      </h1>
 
       <div class="flex flex-col mb-[16px]">
         <label class="text-[14px] font-bold" for="email">Email</label>
@@ -45,9 +47,10 @@
         </button>
         <button 
           class="mb-[24px] font-bold-700 text-secondary"
-          @click="changePage"
         >
-          註冊帳號
+          <router-link :to="{ name: 'register' }">
+            註冊帳號
+          </router-link>
         </button>
       </div>
     </form>
@@ -56,7 +59,6 @@
 
 <script>
 // Utils
-import { defineComponent } from 'vue';
 import { useRouter } from 'vue-router'
 import { useForm, useField, useSubmitForm } from 'vee-validate'
 import * as yup from 'yup'
@@ -75,6 +77,7 @@ export default {
   },
   setup(props, { emit }) {
     const router = useRouter()
+
     useForm({
       validationSchema: LoginSchema
     })
@@ -96,7 +99,7 @@ export default {
     // 請求登入 API
     const fetchSignIn = async (params) => {
       const { message } = await signInAPI(params)
-
+        
       if (message === '登入成功') {
         showSuccess({ content: `${message}` })
         router.push({ name: 'todo' })

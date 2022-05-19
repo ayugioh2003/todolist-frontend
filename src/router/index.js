@@ -1,26 +1,22 @@
 // Utils
 import { createRouter, createWebHistory } from 'vue-router';
 import { getToken } from '@/utils/token.js'
-// Components
-import TodoPage from '../views/TodoPage';
-import RegisterPage from '../views/RegisterPage';
-import LoginPage from '../views/LoginPage';
 
 const routes = [
   {
     path: '/',
     name: 'register',
-    component: RegisterPage,
+    component: () => import('../views/RegisterPage.vue'),
   },
   {
     path: '/login',
     name: 'login',
-    component: LoginPage,
+    component: () => import('../views/LoginPage.vue'),
   },
   {
     path: '/todo',
     name: 'todo',
-    component: TodoPage,
+    component: () => import('../views/TodoPage.vue'),
     meta: {
       isAuth: true
     }

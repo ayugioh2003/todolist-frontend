@@ -2,9 +2,9 @@
   <div class="h-[100vh] flex justify-start items-center flex-col px-8">
     <HeaderComponent />
     <div class="bg-half"></div>
-    <div class="w-full">
+    <div class="w-full flex justify-center">
       <form 
-        class="flex mb-[16px] w-full relative shadow-custom"
+        class="flex mb-[16px] w-full relative max-w-[500px] flex-col"
         @submit.prevent="checkForm"
       >
         <input 
@@ -15,7 +15,7 @@
             w-full leading-[23px] text-[16px] 
             color-placeholder px-[12px] py-[16px] 
             rounded-[6px] border-0 bg-white
-            h-[47px]
+            h-[47px] shadow-custom
           "
         />
         <span class="text-error text-[14px] font-bold mt-[4px]">
@@ -30,13 +30,15 @@
       </form>
     </div>
 
-    <div class="rounded-[10px] bg-white w-full">
+    <div 
+      v-if="allTodo && allTodo.length > 0"
+      class="rounded-[10px] bg-white sm:w-[500px] w-full">
       <ul class="todolist__tabs flex items-center flex-row justify-around shadow-custom">
         <li 
           v-for="tab in tabs" 
           :key="tab.value"
           class="w-full" 
-          @click="activeTab = tab.value"
+          @click="setTodoFilter(tab.value)"
         >
           <a 
             href="#" 
@@ -67,6 +69,8 @@
                 checked:text-checked checked:line-through
                 border-placeholder-500
               "
+              :checked="todo.completed_at"
+              @click="updateTodo(todo.id)"
             >
             <span>{{ todo.content }}</span>
             <a 
@@ -81,7 +85,7 @@
         <!-- 完成 -->
         <div class="h-[88px] flex justify-evenly items-center">
           <span>
-              <a href="#">0</a>
+              <a href="#">{{ completeCount }}</a>
             個已完成項目
           </span>
           <span 
@@ -93,17 +97,22 @@
         </div>
       </div>
     </div>
+
+    <div v-else class="mt-[60px] flex flex-col justify-center items-center">
+      <h2 class="text-[16px] font-normal">目前尚無待辦事項</h2>
+      <img class="mt-[16px]" src="@/assets/empty.png" alt="目前尚無待辦事項">
+    </div>
   </div>
 </template>
 
 <script>
 // Utils
-import { onMounted, ref, reactive } from '@vue/runtime-core'
+import { onMounted, ref, reactive, computed } from 'vue'
 import { useForm, useField, useSubmitForm } from 'vee-validate'
 import { TodoSchema } from '@/utils/schema'
 import { showSuccess } from '@/utils/resHandle'
 // API
-import { getTodoListAPI, createTodoAPI, updateTodoAPI, deleteTodoAPI } from '@/api/todo'
+import { getTodoListAPI, createTodoAPI, updateTodoAPI, deleteTodoAPI, toggleTodoAPI } from '@/api/todo'
 // Components
 import HeaderComponent from '@/components/Header';
 
@@ -120,12 +129,32 @@ export default {
       { name: '已完成', value: 'completed' }
     ])
 
-    const activeTab = ref('all')
+
+    let allTodo = ref([])
     let todos = ref([])
+    const activeTab = ref('all')
+    let completeCount = ref(0)
 
-
+    // 表單驗證
     useForm({ validationSchema: TodoSchema })
     const { value: todo, errorMessage: todoError } = useField('todo');
+
+    const setTodoFilter = (tab) => {
+      activeTab.value = tab
+
+      switch (tab) {
+        case 'all':
+          console.log('all')
+          todos.value = allTodo.value
+          break
+        case 'no-completed':
+          todos.value = allTodo.value.filter(todo => todo.completed_at === null)
+          break
+        case 'completed':
+          todos.value = allTodo.value.filter(todo => todo.completed_at)
+          break
+      }
+    }
 
     // 檢查表單
     const checkForm = useSubmitForm(async(values, actions) => {
@@ -147,43 +176,49 @@ export default {
     // 請求清單
     const getTodoList = async () => {
       const res = await getTodoListAPI()
+      allTodo.value = res.todos
       todos.value = res.todos
+
+      completeCount.value = allTodo.value.filter(item => item.completed_at).length 
     }
 
     // 新增 Todo
     const fetchCreateTodo = async (params) => {
-      try {
-        const { id, content } = await createTodoAPI(params)        
-        if (id && content) handleSuccessCreateTodo(content)
-      } catch (error) {
-        console.error(error)
+      const { id, content } = await createTodoAPI(params)  
+      
+      // 處理成功
+      if (id && content) {
+        showSuccess({ content: `${content} 建立成功` })
+        getTodoList()
       }
     }
 
-    const handleSuccessCreateTodo = (content) => {
-      showSuccess({ content: `${content} 建立成功` })
-      getTodoList()
+    const deleteTodo = async (id) => {
+      const { message } = await deleteTodoAPI(id)
+
+      if (message === '已刪除') {
+        showSuccess({ content: `${id} 刪除成功` })
+        getTodoList()
+      }
     }
 
-    const deleteTodo = async (id) => {
-      try {
-        const { message } = await deleteTodoAPI(id)
+    const updateTodo = async (id) => {
+      const { id: todoId } = await toggleTodoAPI(id)
 
-        if (message === '已刪除') {
-          showSuccess({ content: `${id} 刪除成功` })
-          getTodoList()
-        }
-      } catch (error) {
-        console.error(error)
+      if (todoId) {
+        getTodoList()
+        completeCount.value = todos.value.filter(item => item.completed_at === null).length 
+        showSuccess({ content: `切換狀態成功` })
       }
     }
 
     // 清除已完成項目
-    const clearCompletedTodo = async () => {
-
+    const clearCompletedTodo = async (id) => {
+      await updateTodoAPI(id)
     }
 
     return {
+      allTodo,
       tabs,
       activeTab,
       HeaderComponent,
@@ -193,7 +228,10 @@ export default {
       todoError,
       fetchCreateTodo,
       clearCompletedTodo,
-      deleteTodo
+      deleteTodo,
+      updateTodo,
+      completeCount,
+      setTodoFilter
     }
   }
 
@@ -208,11 +246,9 @@ export default {
 .bg-half {
   width: 100%;
   height: 100vh;
-  background: linear-gradient(175deg, #ffd370 100%, #fff 0%);
-  -webkit-clip-path: polygon(0 0, 100% 0, 100% 46%, 0 69%);
-          clip-path: polygon(0 0, 100% 0, 100% 46%, 0 69%);
+  background: linear-gradient(172.7deg, #FFD370 5.12%, #FFD370 53.33%, #FFD370 53.44%, #FFFFFF 53.45%, #FFFFFF 94.32%);
   position: absolute;
-  top: 0;
+  top: 0px;
   left: 0;
   z-index: -1;
 }

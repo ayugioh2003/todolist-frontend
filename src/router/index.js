@@ -22,7 +22,6 @@ const routes = [
     }
   },
 ];
-import { getToken } from '@/utils/token.js'
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes,

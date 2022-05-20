@@ -74,7 +74,7 @@
             >
             <span>{{ todo.content }}</span>
             <a 
-              class="delete ml-auto mr-[18px]" 
+              class="delete ml-auto mr-[18px] hover:rotate-90 transition-all cursor-pointer" 
               @click="deleteTodo(todo.id)"
             >
               <i class="fa fa-x"></i>

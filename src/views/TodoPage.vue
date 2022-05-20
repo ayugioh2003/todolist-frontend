@@ -90,7 +90,7 @@
           </span>
           <span 
             class="cursor-pointer text-placeholder" 
-            @lick="clearCompletedTodo"
+            @click="clearCompletedTodo"
           >
             清除已完成項目
           </span>
@@ -213,8 +213,22 @@ export default {
     }
 
     // 清除已完成項目
-    const clearCompletedTodo = async (id) => {
-      await updateTodoAPI(id)
+    const clearCompletedTodo = async () => {
+      // 篩選所有已完成狀態的 user id
+      const completedItem = allTodo.value
+        .filter(todo => todo.completed_at)
+        .map(({ id }) => id)
+      
+      const result = []
+      for (let i = 0; i < completedItem.length; i++) {
+        const { message } = await deleteTodoAPI(completedItem[i])
+        result.push({ message })
+      }
+      
+      if (result.every(item => item.message === '已刪除')) {
+        getTodoList()
+        showSuccess({ content: `刪除成功` })
+      }
     }
 
     return {

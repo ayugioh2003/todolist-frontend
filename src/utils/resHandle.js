@@ -4,9 +4,11 @@ export const showSuccess = (
   { title = '成功', content = null }) => {
 
   Swal.fire({
+    position: 'top-end',
     icon: 'success',
-    title: `成功`,
-    text: `${content}`
+    text: `${content}`,
+    showConfirmButton: false,
+    timer: 1500
   })
 }
 
@@ -16,5 +18,7 @@ export const showError = (
     icon: 'error',
     title: `Oppps..${title}`,
     html: content,
+    showConfirmButton: true,
+    timer: 3000
   })
 }

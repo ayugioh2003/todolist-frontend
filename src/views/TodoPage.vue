@@ -188,6 +188,7 @@ export default {
       
       // 處理成功
       if (id && content) {
+        todo.value = ''
         showSuccess({ content: `${content} 建立成功` })
         getTodoList()
       }
@@ -224,7 +225,7 @@ export default {
         const { message } = await deleteTodoAPI(completedItem[i])
         result.push({ message })
       }
-      
+
       if (result.every(item => item.message === '已刪除')) {
         getTodoList()
         showSuccess({ content: `刪除成功` })

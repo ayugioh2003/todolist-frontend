@@ -1,9 +1,17 @@
 <template>
+  <div class="px-[32px] py-[48px] sm:flex sm:flex-row sm:items-center sm:justify-center sm:h-[100vh]">
+    <div class="sm:mr-[6rem]">
+      <LogoImage class="sm:mb-[20px] flex justify-center items-center" />
+      <CoverImage class="hidden sm:block sm:h-[386px]" />
+    </div>
+  
     <form 
       class="mt-[21px] mb-[12px] sm:mt-0 sm:w-[300px]"
       @submit.prevent="checkForm"
     >
-      <h1 class="text-[24px] font-bold text-center">最實用的線上代辦事項服務</h1>
+      <h1 class="whitespace-nowrap mb-[20px] text-[24px] font-bold text-center">
+        最實用的線上代辦事項服務
+      </h1>
 
       <div class="flex flex-col mb-[16px]">
         <label class="text-[14px] font-bold" for="email">Email</label>
@@ -39,40 +47,41 @@
         </button>
         <button 
           class="mb-[24px] font-bold-700 text-secondary"
-          @click="changePage"
         >
-          註冊帳號
+          <router-link :to="{ name: 'register' }">
+            註冊帳號
+          </router-link>
         </button>
       </div>
     </form>
-
+  </div>
 </template>
 
 <script>
 // Utils
-import { defineComponent } from 'vue';
 import { useRouter } from 'vue-router'
 import { useForm, useField, useSubmitForm } from 'vee-validate'
-import * as yup from 'yup'
+import { LoginSchema } from '@/utils/schema' 
+import { showSuccess } from '@/utils/resHandle'
+// API
 import { signInAPI } from '@/api/user.js'
-import Swal from 'sweetalert2'
+// Component
+import LogoImage from '@/components/LogoImage'
+import CoverImage from '@/components/CoverImage';
 
-export default defineComponent({
-  setup(props, { emit }) {
+export default {
+  components: {
+    LogoImage,
+    CoverImage
+  },
+  setup() {
     const router = useRouter()
-    const schema = yup.object({
-      email: yup.string().required('此欄位不可為空').email('Email 格式無效'),
-      password: yup.string().required('此欄位不可為空').min(8, '密碼必須至少 8 字'),
-    });
     useForm({
-      validationSchema: schema
+      validationSchema: LoginSchema
     })
 
     const { value: email, errorMessage: emailError } = useField('email');
     const { value: password, errorMessage: passwordError } = useField('password');
-
-    // 切換頁面
-    const changePage = () => emit('changePage', 'login')
 
     // 檢查表單
     const checkForm = useSubmitForm(async(values, actions) => {
@@ -88,28 +97,22 @@ export default defineComponent({
     // 請求登入 API
     const fetchSignIn = async (params) => {
       const { message } = await signInAPI(params)
-
+        
       if (message === '登入成功') {
-        Swal.fire({
-          icon: 'success',
-          title: `成功`,
-          html: message,
-        })
+        showSuccess({ content: `${message}` })
         router.push({ name: 'todo' })
       }
-
     }
 
     return {
       checkForm,
-      changePage,
       email,
       emailError,
       password,
       passwordError,
     };
   },
-});
+};
 </script>
 
 <style>

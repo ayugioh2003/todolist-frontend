@@ -1,6 +1,12 @@
 <template>
+  <div class="px-[32px] py-[48px] sm:flex sm:flex-row sm:items-center sm:justify-center sm:h-[100vh]">
+    <div class="sm:mr-[6rem]">
+      <LogoImage class="sm:mb-[20px] flex justify-center items-center" />
+      <CoverImage class="hidden sm:block sm:h-[386px]" />
+    </div>
+
     <Form 
-      :validation-schema="schema"
+      :validation-schema="RegisterSchema"
       class="mt-[21px] mb-[12px] sm:mt-0 sm:w-[300px]"
       @submit="checkForm"
       ref="form"
@@ -72,43 +78,47 @@
         </button>
         <button 
           class="mb-[24px] font-bold-700 text-secondary"
-          @click="changePage"
         >
-          登入
+          <router-link :to="{name: 'login'}">
+            登入
+          </router-link>
         </button>
       </div>
     </form>
-
+  </div>
 </template>
 
 <script>
 // Utils
-import { ref, onMounted, defineComponent } from 'vue';
+import { ref, reactive } from 'vue';
 import { useRouter } from "vue-router";
 import { Field, Form } from "vee-validate";
 import { useForm, useField, useSubmitForm } from 'vee-validate';
-import * as yup from 'yup';
-import Swal from 'sweetalert2'
+import { RegisterSchema } from '@/utils/schema'
+import { showSuccess } from '@/utils/resHandle'
 // API
 import { signUpAPI } from '@/api/user.js'
+// Component
+import LogoImage from '@/components/LogoImage'
+import CoverImage from '@/components/CoverImage';
 
-export default defineComponent({
+export default {
   components: {
+    LogoImage,
+    CoverImage,
     Field,
     Form,
   },
-  setup(props, { emit }) {
+  setup() {
     const router = useRouter()
     const form = ref(null) // undefined
-    const schema = yup.object().shape({
-      email: yup.string().required('此欄位不可為空').email('Email 格式無效'),
-      name: yup.string().required('此欄位不可為空').min(2, '暱稱至少兩字'),
-      password: yup.string().required('此欄位不可為空').min(6, '密碼必須至少 6 字'),
-      confirmPassword: yup.string().required('此欄位不可為空').min(6, '密碼必須至少 6 字').oneOf([yup.ref('password')], '密碼與再次輸入密碼不同')
-    });
-
+    const user = reactive({
+      email: '',
+      nickname: ''
+    })
+    
     useForm({
-      validationSchema: schema,
+      validationSchema: RegisterSchema,
     });
 
     const { value: email, errorMessage: emailError } = useField('email');
@@ -116,15 +126,12 @@ export default defineComponent({
     const { value: name, errorMessage: nameError } = useField('name');
     const { value: confirmPassword, errorMessage: confirmPasswordError } = useField('confirmPassword');
 
-    // 切換頁面
-    const changePage = () => emit('changePage', 'register')
-
     // 送出請求
     const checkForm = useSubmitForm(async (values, actions) => {  
       const params = {
         user: {
           email: email.value,
-          name: name.value,
+          nickname: name.value,
           password: password.value
         }
       }
@@ -133,25 +140,21 @@ export default defineComponent({
 
     // 請求註冊 API
     const fetchSignUp = async (params) => {
-      const { message } = await signUpAPI(params)
-      
-        if (message === '註冊成功') {
-          Swal.fire({
-            icon: 'success',
-            title: `成功`,
-            html: message,
-          })
+      const { message, nickname } = await signUpAPI(params)
 
+        if (message === '註冊成功') {
+          sessionStorage.setItem('nickname', nickname)
+          showSuccess({ content: `${message}` })
           // 跳轉頁面
-          router.push({ name: 'home', params: { isRegister: false } })
+          router.push({ name: 'login', params: { isRegister: false } })
         }
     }
 
     return {
+      user,
       form,
       checkForm,
-      changePage,
-      schema,
+      RegisterSchema,
       email,
       emailError,
       password,
@@ -162,7 +165,7 @@ export default defineComponent({
       confirmPasswordError,
     };
   },
-});
+};
 </script>
 
 <style>
